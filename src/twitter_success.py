@@ -103,7 +103,8 @@ async def on_message(msg):
 					post_url = f'https://twitter.com/{my_twitter_screenname}/statuses/{tweet_res}'
 					success_embed = discord.Embed(title="SmartNotify Success", color=0xf16868)
 					success_embed.add_field(name='Success! Check out your post here:', value=post_url)
-					success_embed.set_footer(text="By SmartNotify\t\t" + str(time_stamp))
+					success_embed.set_footer(text="By SmartNotify\t\t" + str(time_stamp), icon_url="https://cdn.discordapp.com/attachments/628750460949364757/631225789538500608/unknown.png")
+					success_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/628750460949364757/631226140601876540/New_logo.png")
 					await msg.channel.send(embed=success_embed)
 				else:
 					await msg.channel.send(f'@{msg.author} an image was found but your tweet failed to post'
