@@ -4,7 +4,11 @@ import requests
 from datetime import datetime
 import logging
 
+now = datetime.now()
+time = now.strftime("%m/%d/%Y %H:%M:%S")
 logging.basicConfig(filename = 'src/twit_success.log', filemode = 'w', format = '%(levelname)s: %(message)s', level = logging.INFO)
+logging.info(f"Starting new session: {time}")
+
 
 # Load API keys
 key_file = 'src/keys.txt'
