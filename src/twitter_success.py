@@ -4,10 +4,9 @@ import requests
 from datetime import datetime
 import logging
 
-now = datetime.now()
-time = now.strftime("%m/%d/%Y %H:%M:%S")
-logging.basicConfig(filename = 'src/twit_success.log', filemode = 'w', format = '%(levelname)s: %(message)s', level = logging.INFO)
-logging.info(f"Starting new session: {time}")
+
+logging.basicConfig(filename = 'src/twit_success.log',level=logging.INFO,
+                    format = '%(asctime)s %(levelname)-8s %(message)s',datefmt='%Y-%m-%d %H:%M:%S')
 
 
 # Load API keys
@@ -65,7 +64,7 @@ def postTweet(twitter_api, msg, image_filename):
 	except:
 		logging.error("Tweet failed")
 		return -1
-	else :
+	else:
 		logging.info("Tweet posted")
 		return f'{res.id}'
 
@@ -92,6 +91,7 @@ async def on_message(msg):
 					f.write(r.content)
 					#logging.info('Image saved')
 		if foundImage == False:
+			#time.sleep(6)
 			await msg.channel.send(f'@{msg.author} your tweet failed to post. Please make sure an image is included.')
 			logging.warning(f'Receieved message but no image from {msg.author}')
 		else: # found an image, time to tweet
@@ -106,6 +106,7 @@ async def on_message(msg):
 					success_embed.set_footer(text="By SmartNotify\t\t" + str(time_stamp), icon_url="https://cdn.discordapp.com/attachments/628750460949364757/631225789538500608/unknown.png")
 					success_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/628750460949364757/631226140601876540/New_logo.png")
 					await msg.channel.send(embed=success_embed)
+					logging.info(f'{msg.author.name} Tweet Confirmation sent in {SUCCESS_CHANNEL} channel')
 				else:
 					await msg.channel.send(f'@{msg.author} an image was found but your tweet failed to post'
 																	'Make sure the attachement is .jpg, .jpeg, .png')
