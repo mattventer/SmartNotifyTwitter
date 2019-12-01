@@ -80,8 +80,7 @@ async def on_message(msg):
 		return
 	elif str(msg.channel) == SUCCESS_CHANNEL: #looking for image to tweet
 		for attachment in msg.attachments:
-			if str(attachment.url).endswith(('.jpg', '.jpeg', '.png')): #found image
-				foundImage = True
+			try:
 				url = str(attachment.url)
 				#logging.info(f'Found image at {url}')
 				image_filename = 'src/new_image.jpg'
@@ -89,12 +88,30 @@ async def on_message(msg):
 				# Save locally
 				with open(image_filename, 'wb') as f:
 					f.write(r.content)
-					#logging.info('Image saved')
-		if foundImage == False:
-			#time.sleep(6)
-			await msg.channel.send(f'@{msg.author} your tweet failed to post. Please make sure an image is included.')
-			logging.warning(f'Receieved message but no image from {msg.author}')
-		else: # found an image, time to tweet
+					logging.info('Image saved')
+					foundImage = True
+			except:
+				logging.error('Could not save image')
+				foundImage = False
+		if foundImage == False: # image not directly embedded, look for link
+			url = str(msg.content)
+			try:
+				r = requests.get(url)
+			except:
+				logging.warning(f'Message is not an image or url from {msg.author.name}')
+				return
+			else:
+				logging.info(f'Found URL: {url}')
+				# Save locally
+				if r:
+					image_filename = 'src/new_image.jpg'
+					with open(image_filename, 'wb') as f:
+						f.write(r.content)
+						logging.info('Image saved')
+						foundImage = True
+				else:
+					logging.error(f'Found a URL at {url} but could not download image')
+		if foundImage == True: # found an image, time to tweet
 			tweet_body = f'Success from {msg.author.name} in @NotifySmart'
 			if image_filename != None:
 				tweet_res = postTweet(twit_client, tweet_body, image_filename)
@@ -108,9 +125,7 @@ async def on_message(msg):
 					await msg.channel.send(embed=success_embed)
 					logging.info(f'{msg.author.name} Tweet Confirmation sent in {SUCCESS_CHANNEL} channel')
 				else:
-					await msg.channel.send(f'@{msg.author} an image was found but your tweet failed to post'
-																	'Make sure the attachement is .jpg, .jpeg, .png')
-					logging.error(f'Tweet failed from {msg.author}')
+					logging.error('Image was found and saved but failed to tweet.')
 			else:
 				logging.error('Image filename is None')
 	else: #Not in success channel, ingore
